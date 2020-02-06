@@ -35,7 +35,9 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'api-teste-estagio.herokuapp.com',
+]
 
 
 # Application definition
