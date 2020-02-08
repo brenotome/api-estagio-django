@@ -9,3 +9,13 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         extra_kwargs = {
             'password':{'write_only':True}
         }
+
+class ProductSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Product
+        fields = ('id','url','name','description','price','creation_date','stock')
+
+class OrderSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Order
+        fields = ('id','url','product','user','quantity','total_price','paid')
