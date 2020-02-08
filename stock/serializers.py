@@ -14,6 +14,9 @@ class ProductSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Product
         fields = ('id','url','name','description','price','creation_date','stock')
+        extra_kwargs = {
+            'creation_date':{'read_only':True}
+        }
 
 class OrderSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

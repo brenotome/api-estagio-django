@@ -19,7 +19,7 @@ class Product(models.Model):
     name            = models.CharField(max_length=50)
     description     = models.CharField(max_length=200)
     price           = models.DecimalField(max_digits=6, decimal_places=2)
-    creation_date   = models.DateField(auto_now=False, auto_now_add=False)
+    date            = models.DateTimeField(auto_now=False, auto_now_add=True)
     stock           = models.IntegerField()
     
     def __str__(self):
