@@ -26,11 +26,16 @@ class Product(models.Model):
         return self.name
 
 class Order(models.Model):
+
     product         =models.ForeignKey(Product, on_delete=models.CASCADE)
     user            =models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     quantity        =models.IntegerField()
     total_price     =models.DecimalField(max_digits=6, decimal_places=2)
     paid            =models.BooleanField()
+    
+    # def save(self,*args,**kwargs):
+    #     self.total_price = self.quantity*self.product.price
+    #     super(Order,self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.product+self.user
+        return self.product.__str__()+self.user.__str__()
