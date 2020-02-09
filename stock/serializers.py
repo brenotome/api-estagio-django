@@ -4,27 +4,30 @@ from .models import Order,Product,User
 from rest_framework.response import Response
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User #settings.AUTH_USER_MODEL
-        fields = ('id','url','username','password','email','first_name','last_name','address')
+        fields = ('id','username','password','email','first_name','last_name','address')
         extra_kwargs = {
             'password':{'write_only':True}
         }
 
-class ProductSerializer(serializers.HyperlinkedModelSerializer):
+class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ('id','url','name','description','price','date','stock')
+        fields = ('id','name','description','price','date','stock')
         read_only_fields = ['date']
-        # extra_kwargs = {
-        #     'creation_date':{'read_only':True}
-        # }
 
-class OrderSerializer(serializers.HyperlinkedModelSerializer):
+class ProductListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ('id','name','price','stock')
+
+class OrderSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(many=False, read_only=True)
     class Meta:
         model = Order
-        fields = ('id','url','product','user','quantity','total_price','paid')
+        fields = ('id','product','user','quantity','total_price','paid')
         read_only_fields = ['total_price','paid']
 
     def create(self, validated_data):
@@ -48,7 +51,7 @@ class OrderSerializer(serializers.HyperlinkedModelSerializer):
         order = instance
         product = order.product
         if(validated_data['quantity'] <= product.stock+order.quantity):
-            product.quantity += product.stock
+            product.stock += order.quantity
             order.quantity = validated_data['quantity']
             order.total_price = order.quantity * order.product.price
             order.save()
@@ -57,10 +60,3 @@ class OrderSerializer(serializers.HyperlinkedModelSerializer):
             return order
         else:
             raise serializers.ValidationError("Out of Stock")
-    
-    def delete(self, pk):
-        order = Order.objects.get(pk=pk)
-        product = order.product
-        product.stock += order.quantity
-        product.save()
-        order.delete()

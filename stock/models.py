@@ -20,7 +20,7 @@ class Product(models.Model):
     description     = models.CharField(max_length=200)
     price           = models.DecimalField(max_digits=6, decimal_places=2)
     date            = models.DateTimeField(auto_now=False, auto_now_add=True)
-    stock           = models.IntegerField()
+    stock           = models.PositiveIntegerField()
     
     def __str__(self):
         return self.name
@@ -29,7 +29,7 @@ class Order(models.Model):
 
     product         =models.ForeignKey(Product, on_delete=models.CASCADE)
     user            =models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    quantity        =models.IntegerField()
+    quantity        =models.PositiveIntegerField()
     total_price     =models.DecimalField(max_digits=6, decimal_places=2)
     paid            =models.BooleanField()
     

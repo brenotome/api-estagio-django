@@ -3,7 +3,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import User, Product, Order
-from .serializers import UserSerializer, ProductSerializer, OrderSerializer
+from .serializers import UserSerializer, ProductSerializer, ProductListSerializer, OrderSerializer
 from django.core import serializers
 
 class UserView(viewsets.ModelViewSet):
@@ -19,10 +19,23 @@ class UserView(viewsets.ModelViewSet):
 class ProductView(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    
+
+    def list(self,request):
+        queryset = Product.objects.all()
+        serializer = ProductListSerializer(queryset,many=True)
+        return Response(serializer.data)
+
 class OrderView(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        order = self.get_object()
+        product = order.product
+        product.stock += order.quantity
+        product.save()
+        self.perform_destroy(order)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=['post'], name='pay')
     def pay(self,request,pk=None):
