@@ -3,18 +3,16 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import User, Product, Order
 from .serializers import UserSerializer, ProductSerializer, ProductListSerializer, OrderSerializer, OrderReadSerializer
-from stock.permissions import IsOwner
-from .helpers import PdfRender
+from stock.permissions import IsOwner, IsUser
+from .pdf import PdfRender
 
 class UserView(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = (IsUser,)
     
-    @action(detail=True, methods=['get'], name='orders')
-    def orders(self,request,pk):
-        user = self.get_object()
-        orders = Order.objects.filter(user = user)
-        return Response(list(orders.values()))
+    def list(self,request):
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 class ProductView(viewsets.ModelViewSet):
     queryset = Product.objects.all()
@@ -35,6 +33,12 @@ class OrderView(viewsets.ModelViewSet):
         queryset = Order.objects.filter(user=request.user)
         serializer = OrderReadSerializer(queryset,many=True)
         return Response(serializer.data)
+    
+    def retrieve(self,request,pk):
+        print(pk)
+        queryset = Order.objects.get(pk=pk)
+        serializer = OrderReadSerializer(queryset)
+        return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
         order = self.get_object()
@@ -50,6 +54,6 @@ class OrderView(viewsets.ModelViewSet):
         if not order.paid:
             order.paid = True
             order.save()
-            return PdfRender.renderRecipe(self,order) #Response(self.get_serializer(order).data)
+            return PdfRender.renderRecipe(self,order)
         else:
             return Response("Order already paid")

@@ -2,7 +2,6 @@ import io
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter, A4
-# from django.core.files.storage import default_storage
 
 class PdfRender:
     def renderRecipe(self,order):
@@ -23,5 +22,4 @@ class PdfRender:
         pdf.save()
 
         buffer.seek(0)
-        # file_name = default_storage.save('recipe', buffer)
         return FileResponse(buffer, as_attachment=True, filename='recipe.pdf')
