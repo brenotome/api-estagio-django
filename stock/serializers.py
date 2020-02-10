@@ -2,6 +2,7 @@ from rest_framework import serializers, status
 from django.conf import settings
 from .models import Order,Product,User
 from rest_framework.response import Response
+from django.contrib.auth.hashers import make_password
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -11,6 +12,9 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password':{'write_only':True}
         }
+    
+    def validate_password(self, value: str) -> str:
+        return make_password(value)
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,16 +27,22 @@ class ProductListSerializer(serializers.ModelSerializer):
         model = Product
         fields = ('id','name','price','stock')
 
-class OrderSerializer(serializers.ModelSerializer):
+class OrderReadSerializer(serializers.ModelSerializer):
     product = ProductSerializer(many=False, read_only=True)
     class Meta:
         model = Order
         fields = ('id','product','user','quantity','total_price','paid')
         read_only_fields = ['total_price','paid']
 
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ('id','product','user','quantity','total_price','paid')
+        read_only_fields = ['total_price','paid','user']
+
     def create(self, validated_data):
         order = Order(
-            user=validated_data['user'],
+            user=self.context['request'].user,
             product=validated_data['product'],
             quantity=validated_data['quantity'],
             paid = False,
