@@ -1,4 +1,4 @@
-Django==3.0.2
+exiDjango==3.0.2
 djangorestframework==3.11.0
 djangorestframework-simplejwt==4.4.0
 gunicorn==20.0.4
@@ -6,3 +6,4 @@ psycopg2==2.7.4
 psycopg2-binary==2.8.4
 pytz==2018.5
 whitenoise==5.0.1
+reportlab==3.5.34
