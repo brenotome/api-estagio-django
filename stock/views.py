@@ -1,11 +1,10 @@
-# from django.shortcuts import render
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import User, Product, Order
 from .serializers import UserSerializer, ProductSerializer, ProductListSerializer, OrderSerializer, OrderReadSerializer
-from django.core import serializers
 from stock.permissions import IsOwner
+from .helpers import PdfRender
 
 class UserView(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -48,6 +47,9 @@ class OrderView(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], name='pay')
     def pay(self,request,pk=None):
         order = self.get_object()
-        order.paid = True
-        order.save()
-        return Response(self.get_serializer(order).data)
+        if not order.paid:
+            order.paid = True
+            order.save()
+            return PdfRender.renderRecipe(self,order) #Response(self.get_serializer(order).data)
+        else:
+            return Response("Order already paid")
