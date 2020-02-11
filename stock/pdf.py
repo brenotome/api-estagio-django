@@ -4,7 +4,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter, A4
 
 class PdfRender:
-    def renderRecipe(self,order):
+    def renderReceipt(self,order):
         buffer = io.BytesIO()
         pdf = canvas.Canvas(buffer,pagesize=letter)
 
@@ -22,4 +22,4 @@ class PdfRender:
         pdf.save()
 
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename='recipe.pdf')
+        return FileResponse(buffer, as_attachment=True, filename='receipt.pdf')

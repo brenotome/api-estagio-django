@@ -54,6 +54,6 @@ class OrderView(viewsets.ModelViewSet):
         if not order.paid:
             order.paid = True
             order.save()
-            return PdfRender.renderRecipe(self,order)
+            return PdfRender.renderReceipt(self,order)
         else:
             return Response("Order already paid")
